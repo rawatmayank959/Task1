@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Responsive Nav Bar</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --accent:#0f1724;   /* dark slate */
+      --muted:#64748b;    /* slate-400 */
+      --accent-2:#0ea5a4; /* teal-ish */
+      --glass: rgba(15,23,36,0.04);
+      --radius: 12px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+                   Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#f8fafc 0%, #fff 100%);
+      color:var(--accent);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-top:72px; /* make room for fixed navbar in demo */
+    }
+
+    /* NAVBAR */
+    .nav {
+      position: fixed;
+      top:0; left:0; right:0;
+      height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      backdrop-filter: blur(4px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+      border-bottom:1px solid rgba(15,23,36,0.06);
+      z-index:1000;
+      box-shadow: 0 6px 20px rgba(2,6,23,0.04);
+    }
+
+    .nav-inner{
+      width:100%;
+      max-width:1100px;
+      padding:0 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:var(--accent);
+    }
+
+    .brand .logo {
+      width:42px;
+      height:42px;
+      border-radius:10px;
+      background:var(--glass);
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      color:var(--accent-2);
+      font-size:18px;
+      box-shadow: 0 2px 6px rgba(2,6,23,0.04);
+    }
+
+    .brand .title { font-weight:600; font-size:16px; letter-spacing:-0.2px; }
+
+    /* Desktop menu */
+    .menu {
+      display:flex;
+      gap:22px;
+      align-items:center;
+    }
+    .menu a{
+      text-decoration:none;
+      color:var(--muted);
+      font-weight:600;
+      padding:8px 10px;
+      border-radius:8px;
+      transition: all .18s ease;
+    }
+    .menu a:hover,
+    .menu a:focus{
+      color:var(--accent);
+      background: rgba(14,165,164,0.06);
+      outline:none;
+    }
+
+    /* CTA (optional) */
+    .cta {
+      padding:8px 14px;
+      border-radius:10px;
+      background:var(--accent-2);
+      color:white;
+      font-weight:700;
+      text-decoration:none;
+      margin-left:6px;
+      box-shadow: 0 6px 18px rgba(14,165,164,0.14);
+    }
+    .cta:focus{ outline:3px solid rgba(14,165,164,0.18); }
+
+    /* Mobile hamburger */
+    .hamburger {
+      display:none;
+      background:transparent;
+      border:0;
+      cursor:pointer;
+      padding:8px;
+      border-radius:8px;
+      transition: background .12s;
+    }
+    .hamburger:focus{ outline:3px solid rgba(14,165,164,0.14); }
+
+    /* Mobile menu panel */
+    .mobile-panel{
+      display:none;
+      position:fixed;
+      left:0; right:0;
+      top:72px;
+      background: white;
+      border-top:1px solid rgba(15,23,36,0.04);
+      box-shadow:0 10px 30px rgba(2,6,23,0.06);
+      z-index:999;
+      padding:12px 20px;
+    }
+    .mobile-panel a{
+      display:block;
+      padding:12px 8px;
+      text-decoration:none;
+      color:var(--accent);
+      border-radius:8px;
+      font-weight:600;
+    }
+    .mobile-panel a:hover,
+    .mobile-panel a:focus{ background:var(--glass); }
+
+    /* Responsive breakpoints */
+    @media (max-width: 768px){
+      .menu { display:none; }
+      .hamburger { display:inline-flex; align-items:center; justify-content:center; }
+      .mobile-panel{ display:block; /* controlled by JS via .open */ max-height:0; overflow:hidden; transition: max-height .22s ease; }
+      .mobile-panel.open{ max-height:320px; /* enough for few links */ }
+    }
+
+    /* small demonstration content */
+    .demo {
+      max-width:1100px;
+      margin: 28px auto;
+      padding:24px;
+      border-radius:12px;
+      background: white;
+      border:1px solid rgba(2,6,23,0.04);
+      box-shadow:0 6px 20px rgba(2,6,23,0.03);
+    }
+
+    /* focus-visible for keyboard users */
+    :focus:not(:focus-visible){ outline: none; }
+  </style>
+</head>
+<body>
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <a class="brand" href="#home" aria-label="Homepage">
+        <div class="logo">MS</div>
+        <div class="title">MySite</div>
+      </a>
+
+      <!-- Desktop links -->
+      <nav role="navigation" aria-label="Main Navigation" class="menu">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#signup" class="cta">Sign Up</a>
+      </nav>
+
+      <!-- Mobile hamburger -->
+      <button class="hamburger" id="navToggle" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open menu">
+        <!-- simple hamburger icon (SVG) -->
+        <svg id="hambIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile panel (hidden by default; JS toggles .open) -->
+  <div id="mobileMenu" class="mobile-panel" aria-hidden="true">
+    <a href="#home" class="mobile-link">Home</a>
+    <a href="#about" class="mobile-link">About</a>
+    <a href="#contact" class="mobile-link">Contact</a>
+    <a href="#signup" class="mobile-link" style="margin-top:6px; background:var(--accent-2); color:#fff; text-align:center; font-weight:700; border-radius:10px; padding:10px 8px;">Sign Up</a>
+  </div>
+
+  
+
+    <section class="demo" id="about" style="margin-top:18px;">
+      <h2>About</h2>
+      <p>Replace these sections with your real content.</p>
+    </section>
+
+    <section class="demo" id="contact" style="margin-top:18px;">
+      <h2>Contact</h2>
+      <p>Contact links can be mailto: or route to your contact page.</p>
+    </section>
+
+    <section class="demo" id="signup" style="margin-top:18px;">
+      <h2>Sign Up</h2>
+      <p>CTA link in nav goes here.</p>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('navToggle');
+      const panel = document.getElementById('mobileMenu');
+
+      function openMenu(){
+        btn.setAttribute('aria-expanded','true');
+        panel.classList.add('open');
+        panel.setAttribute('aria-hidden','false');
+        // change icon to X
+        btn.innerHTML = '<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"M6 6l12 12M6 18L18 6\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg>';
+      }
+      function closeMenu(){
+        btn.setAttribute('aria-expanded','false');
+        panel.classList.remove('open');
+        panel.setAttribute('aria-hidden','true');
+        btn.innerHTML = '<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"M4 7h16M4 12h16M4 17h16\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg>';
+      }
+
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        if (expanded) closeMenu(); else openMenu();
+      });
+
+      // Close the mobile menu when a link is clicked (nice UX)
+      document.querySelectorAll('.mobile-panel a, .mobile-link').forEach(a=>{
+        a.addEventListener('click', () => {
+          // small timeout so navigation feels responsive on SPA and anchor jumps
+          setTimeout(closeMenu, 120);
+        });
+      });
+
+      // Close menu on ESC
+      document.addEventListener('keydown', (e)=> {
+        if (e.key === 'Escape') closeMenu();
+      });
+
+      // Optional: close when clicking outside panel on mobile
+      document.addEventListener('click', (e) => {
+        const isClickInside = panel.contains(e.target) || btn.contains(e.target);
+        if (!isClickInside && panel.classList.contains('open')) closeMenu();
+      });
+    })();
+  </script>
+</body>
+</html>
